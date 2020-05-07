@@ -15,7 +15,7 @@ public class GridController : MonoBehaviour
     public int ColumnLength, RowLength;
     public float X_Space, Y_Space;
 
-    public Vector3 velocity = Vector3.up;
+    Vector3 velocity = Vector3.up;
     bool mix = false;
 
     string lettersSource;
@@ -23,6 +23,15 @@ public class GridController : MonoBehaviour
     List<GameObject> lettersGridElement = new List<GameObject>();
     List<Vector3> gridPoints = new List<Vector3>();
     // Start is called before the first frame update
+
+    [SerializeField]
+    private TMP_InputField inputFieldWidth;
+    [SerializeField]
+    private TMP_InputField inputFieldHeight;
+
+    private float elementOnGameGrid;
+    int letterArrayCount;
+
     void Start()
     {
 
@@ -30,6 +39,7 @@ public class GridController : MonoBehaviour
 
         letterArray = lettersSource.Split(',');
 
+        letterArrayCount = letterArray.Length;
 
 
         for (int i = 0; i < letterArray.Length; i++)
@@ -51,22 +61,66 @@ public class GridController : MonoBehaviour
         }
 
 
-        DrawGrid();
+        //DrawGrid();
 
     }
 
     //Draw grid
-    void DrawGrid()
+    public void DrawGrid()
     {
 
-        for (int i = 0; i < ColumnLength * RowLength; i++)
+        //validate input for non empty and not string
+        if (int.TryParse(inputFieldWidth.text, out int column)){
+
+            ColumnLength = column;
+
+        }
+
+        if (int.TryParse(inputFieldHeight.text, out int row))
         {
 
+            RowLength = row;
+
+        }
+
+        int mulCountColumnRow = ColumnLength * RowLength;
+        elementOnGameGrid = mulCountColumnRow;
+
+        for (int k = 0; k < letterArrayCount; k++) {
+
+            lettersGridElement[k].GetComponent<LetterElement>().OnGrid = false;
+            lettersGridElement[k].GetComponent<RectTransform>().transform.localPosition = LETTER_ELEMENT.transform.localPosition;
+
+        }
+
+        for (int i = 0; i < mulCountColumnRow; i++)
+        {
+
+            
             Vector2 elementPosition = new Vector2(X_Start + (X_Space * (i % ColumnLength)), Y_Start + (-Y_Space * (i / ColumnLength)));
+            lettersGridElement[i].GetComponent<LetterElement>().OnGrid = true;
             lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition = elementPosition;
 
 
+
         }
+
+    }
+    /// <summary>
+    /// Represent Count Showing letters element on game field
+    /// </summary>
+    /// <param name="count"></param>
+    void HideLetterFromViewOnGameGrid(int count) {
+
+        
+        for (int i = 0; i < count; i++)
+        {
+            if (!lettersGridElement[i].GetComponent<LetterElement>().OnGrid)
+                lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition = LETTER_ELEMENT.transform.localPosition;
+
+
+        }
+
 
     }
 
@@ -85,7 +139,8 @@ public class GridController : MonoBehaviour
 
         RandomMixPoints();
 
-        mix = true;
+        //delete
+        //mix = true;
 
     }
 
@@ -119,25 +174,22 @@ public class GridController : MonoBehaviour
         {
 
             Vector3 posPoint = gridPoints[i];
-            Debug.Log(posPoint);
+            
             //lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition = posPoint;
-            /*
-            StartCoroutine(ElementTakePlaceAfterMix(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition
-                , posPoint));
-             */   
+            
+            StartCoroutine(ElementTakePlaceAfterMix(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i]));
+               
         }
 
     }
 
     private void Update()
     {
+        //delete
         if (mix) {
-
+            Debug.Log("Test");
             for (int i = 0; i < lettersGridElement.Count - 1; i++) {
 
-                /*
-                lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition =
-                    Vector3.Lerp(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], 2f * Time.deltaTime);*/
                 lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition =
                     Vector3.SmoothDamp(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 2f * Time.deltaTime);
 
@@ -149,22 +201,22 @@ public class GridController : MonoBehaviour
     }
 
     //Letters Grid Mix Animation
+    //TODO: Refactor
     IEnumerator ElementTakePlaceAfterMix(Vector3 startPos, Vector3 endPos)
     {
 
-        
         while (Vector3.Distance(startPos, endPos) > 0.01f)
         {
 
             for (int i = 0; i < lettersGridElement.Count - 1; i++)
             {
 
-                Debug.Log(endPos);
-                lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition =
-                    Vector3.SmoothDamp(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 2f * Time.deltaTime);
-                yield return null;
+                if (lettersGridElement[i].GetComponent<LetterElement>().OnGrid)
+                    lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition =
+                        Vector3.SmoothDamp(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 6f * Time.deltaTime);
+                
             }
-            
+            yield return new WaitForFixedUpdate();
 
         }
 

@@ -6,5 +6,6 @@ public class LetterElement : MonoBehaviour
 {
 
     public int Index;
+    public bool OnGrid;
 
 }
