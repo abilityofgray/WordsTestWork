@@ -118,11 +118,12 @@ public class GridController : MonoBehaviour
             {
 
                 var _random = new System.Random();
-                int r = Random.Range(0, lettersDataList.Count - 1 );
-                Debug.Log(r);
 
-                
-                
+
+                var r = RandomNoDuplicate();
+                //Debug.Log(r);
+                //ShuffleElementInData();
+
                 //i
                 if (lettersDataList[r].TryGetComponent(out LetterElement lelement)) {
 
@@ -179,11 +180,25 @@ public class GridController : MonoBehaviour
 
         //WordsGridContainer.GetComponent<RectTransform>().localPosition = new Vector3(GridWidthSize / 2 - X_Space , GridHeigthSize / 2 - Y_Space, 0);
     }
+    int recurs = 0;
+    public int RandomNoDuplicate()
+    {
 
-    void GenerateGrid() {
+        var random = new System.Random();
+        int r = Random.Range(0, lettersDataList.Count - 1);
+        if (lettersElemetOnGameGrid.Contains(lettersDataList[r]))
+        {
+            
+            return RandomNoDuplicate();
+
+        }
+        else {
+
+            return r;
+
+        }
 
         
-
 
     }
 
@@ -284,6 +299,23 @@ public class GridController : MonoBehaviour
 
         }
         
+    }
+
+    void ShuffleElementInData() {
+
+        List<GameObject> randomList = new List<GameObject>();
+
+        for (int i = 0; i < lettersDataList.Count; i++) {
+
+            var random = new System.Random();
+            int r = random.Next(0, lettersDataList.Count);
+            randomList.Add(lettersDataList[r]);
+            lettersDataList.RemoveAt(r);
+
+        }
+
+        lettersDataList = randomList;
+
     }
 
     void RandomMixPoints()
