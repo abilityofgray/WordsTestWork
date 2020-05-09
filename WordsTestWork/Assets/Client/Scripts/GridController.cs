@@ -2,51 +2,63 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+
 
 public class GridController : MonoBehaviour
 {
 
-    public GameObject LETTER_ELEMENT;
-    public GameObject GAME_GRID;
+    public static GridController instance = null;
 
+    public GameObject GridCharPrefab;
+    public GameObject WordsGridContainer;
 
+    public WordsGameDataSettings DataSettings;
 
     public float X_Start, Y_Start;
     public int ColumnLength, RowLength;
     public float X_Space, Y_Space;
 
     Vector3 velocity = Vector3.up;
-    bool mix = false;
+
+    public bool mix = false;
 
     string lettersSource;
     string[] letterArray;
-    List<GameObject> lettersGridElement = new List<GameObject>();
+    List<GameObject> lettersDataList = new List<GameObject>();
+    List<GameObject> lettersElemetOnGameGrid = new List<GameObject>(); 
     List<Vector3> gridPoints = new List<Vector3>();
     // Start is called before the first frame update
 
-    [SerializeField]
-    private TMP_InputField inputFieldWidth;
-    [SerializeField]
-    private TMP_InputField inputFieldHeight;
-
+    public int GridWidthSize;
+    public int GridHeigthSize;
     private float elementOnGameGrid;
     int letterArrayCount;
 
     void Start()
     {
+        if (instance == null)
+            instance = this;
 
-        lettersSource = "q,w,e,r,t,y,u,i,o,p,a,s,d,f,g,h,j,k,l,z,x,c,v,b,n,m";
+        InitGridSettings();
 
-        letterArray = lettersSource.Split(',');
+    }
+
+    private void InitGridSettings ()
+    {
+
+        InputController.instance.SetMaxWidthLenght = DataSettings.GetMaxGridWidhtSize;
+        InputController.instance.SetMaxHeightLenght = DataSettings.GetMaxGridHeighSize;
+
+        letterArray = DataSettings.GetLettersDataSource.Split(',');
 
         letterArrayCount = letterArray.Length;
-
 
         for (int i = 0; i < letterArray.Length; i++)
         {
 
 
-            GameObject go = Instantiate(LETTER_ELEMENT, GAME_GRID.transform);
+            GameObject go = Instantiate(GridCharPrefab, WordsGridContainer.transform);
             go.GetComponent<LetterElement>().Index = i;
 
             if (go.TryGetComponent(out TextMeshProUGUI text))
@@ -56,12 +68,9 @@ public class GridController : MonoBehaviour
 
             }
 
-            lettersGridElement.Add(go);
+            lettersDataList.Add(go);
 
         }
-
-
-        //DrawGrid();
 
     }
 
@@ -69,39 +78,156 @@ public class GridController : MonoBehaviour
     public void DrawGrid()
     {
 
-        //validate input for non empty and not string
-        if (int.TryParse(inputFieldWidth.text, out int column)){
+        mix = false;
+        //StopAllCoroutines();
+        //validate input for non empty and not string and check for 
+        ColumnLength = InputController.instance.InputWidthValidate();
+        RowLength = InputController.instance.InputHeightValidate();
 
-            ColumnLength = column;
-
-        }
-
-        if (int.TryParse(inputFieldHeight.text, out int row))
+        //Check for inputField not empty  
+        if (ColumnLength > 0 &&
+            RowLength > 0)
         {
 
-            RowLength = row;
+            int mulCountColumnRow = ColumnLength * RowLength;
+            elementOnGameGrid = mulCountColumnRow;
 
-        }
+            //Reset all leters;
 
-        int mulCountColumnRow = ColumnLength * RowLength;
-        elementOnGameGrid = mulCountColumnRow;
 
-        for (int k = 0; k < letterArrayCount; k++) {
 
-            lettersGridElement[k].GetComponent<LetterElement>().OnGrid = false;
-            lettersGridElement[k].GetComponent<RectTransform>().transform.localPosition = LETTER_ELEMENT.transform.localPosition;
+            for (int k = 0; k < lettersElemetOnGameGrid.Count; k++)
+            {
 
-        }
+                lettersElemetOnGameGrid[k].GetComponent<LetterElement>().OnGrid = false;
+                lettersElemetOnGameGrid[k].GetComponent<RectTransform>().transform.localPosition = GridCharPrefab.transform.localPosition;
+                //ChangeLettersSize(36);
 
-        for (int i = 0; i < mulCountColumnRow; i++)
-        {
+            }
+
+
+            lettersElemetOnGameGrid.Clear();
+
+
+            CheckScreenWidthHeight();
+
 
             
-            Vector2 elementPosition = new Vector2(X_Start + (X_Space * (i % ColumnLength)), Y_Start + (-Y_Space * (i / ColumnLength)));
-            lettersGridElement[i].GetComponent<LetterElement>().OnGrid = true;
-            lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition = elementPosition;
+
+            for (int i = 0; i < mulCountColumnRow; i++)
+            {
+
+                var _random = new System.Random();
+                int r = Random.Range(0, lettersDataList.Count - 1 );
+                Debug.Log(r);
+
+                
+                
+                //i
+                if (lettersDataList[r].TryGetComponent(out LetterElement lelement)) {
+
+                    
+                    lelement.OnGrid = true;
+
+                }
+
+                Vector2 elementPosition = new Vector2(X_Start + (X_Space * (i % ColumnLength)), Y_Start + (-Y_Space * (i / ColumnLength)));
+
+                //i
+                if (lettersDataList[r].TryGetComponent(out RectTransform rectTrans)) {
+
+                    rectTrans.localPosition = elementPosition;
+
+                }
+                
+                //i
+                lettersElemetOnGameGrid.Add(lettersDataList[r]);
+
+                if (ColumnLength > RowLength)
+                {
+
+                    ChangeLettersSize((int)(200 / ColumnLength));
+
+                }
+                else
+                {
+
+                    ChangeLettersSize((int)(200 / RowLength));
+
+                }
 
 
+
+            }
+
+            
+
+            WordsGridContainer.GetComponent<RectTransform>().localPosition = new Vector3(-lettersElemetOnGameGrid[mulCountColumnRow - 1].transform.localPosition.x / 2,
+                (-lettersElemetOnGameGrid[mulCountColumnRow - 1].transform.localPosition.y / 2),
+                0);
+
+            
+
+        }
+        else {
+
+           UIController.instance.PopUpWarnings(true,
+                    "Введите ширину и высоту не больше 12");
+                
+        }
+
+
+        //WordsGridContainer.GetComponent<RectTransform>().localPosition = new Vector3(GridWidthSize / 2 - X_Space , GridHeigthSize / 2 - Y_Space, 0);
+    }
+
+    void GenerateGrid() {
+
+        
+
+
+    }
+
+    void CheckScreenWidthHeight() {
+
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+        //Debug.Log(screenWidth);
+
+        float GameGridWidth = (ColumnLength * 30) + (X_Space * (ColumnLength - 1));
+        float GameGridHeight = (RowLength * 30) + (Y_Space * (RowLength - 1));
+
+
+        //float width = (screenWidth - GameGridWidth) / ColumnLength;
+        float width = screenWidth - GameGridWidth;
+
+        //X_Space = defaultSpace / ColumnLength;
+        //Y_Space = defaultSpace / RowLength;
+
+        float cellSpace = DataSettings.GetDefaultCellSpace;
+
+        if (ColumnLength > RowLength)
+        {
+
+            X_Space = cellSpace / ColumnLength;
+            Y_Space = cellSpace / ColumnLength;
+
+        }
+        else {
+
+            X_Space = cellSpace / RowLength;
+            Y_Space = cellSpace / RowLength;
+
+        }
+
+
+    }
+
+    void ChangeLettersSize(int fontSize) {
+
+        for (int i = 0; i < lettersElemetOnGameGrid.Count; i++) {
+
+            //lettersDataList[i].GetComponent<TextMeshProUGUI>().fontSize = fontSize;
+            lettersElemetOnGameGrid[i].GetComponent<TextMeshProUGUI>().fontSize = fontSize;
 
         }
 
@@ -115,8 +241,8 @@ public class GridController : MonoBehaviour
         
         for (int i = 0; i < count; i++)
         {
-            if (!lettersGridElement[i].GetComponent<LetterElement>().OnGrid)
-                lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition = LETTER_ELEMENT.transform.localPosition;
+            if (!lettersDataList[i].GetComponent<LetterElement>().OnGrid)
+                lettersDataList[i].GetComponent<RectTransform>().transform.localPosition = GridCharPrefab.transform.localPosition;
 
 
         }
@@ -129,19 +255,35 @@ public class GridController : MonoBehaviour
     public void MixGrid()
     {
 
-        for (int i = 0; i < lettersGridElement.Count - 1; i++)
+        mix = false;
+        if (lettersElemetOnGameGrid.Count != 0)
         {
 
-            Vector3 posPoint = lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition;
-            gridPoints.Add(posPoint);
+            gridPoints.Clear();
+
+
+            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
+            {
+
+                Vector3 posPoint = lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition;
+                gridPoints.Add(posPoint);
+
+
+            }
+            //Debug.Log(gridPoints.Count);
+            RandomMixPoints();
+
+            //
+            mix = true;
 
         }
+        else {
 
-        RandomMixPoints();
+            UIController.instance.PopUpWarnings(true, 
+                "Нечего перемешивать");
 
-        //delete
-        //mix = true;
-
+        }
+        
     }
 
     void RandomMixPoints()
@@ -149,52 +291,86 @@ public class GridController : MonoBehaviour
 
         int listCount = gridPoints.Count;
         int lastElement = listCount - 1;
-
+        List<Vector3> randomList = new List<Vector3>();
         //Shuffle gridPoints;
-        for (int i = 0; i < lastElement; i++)
+        for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
         {
 
-            //TODO: Add check to do not repeat random value
-            int r = Random.Range(i, listCount);
-            var tmp = gridPoints[i];
-            gridPoints[i] = gridPoints[r];
-            gridPoints[r] = tmp;
+            //Debug.Log(i);
+            var random = new System.Random();
+            
+            int r = random.Next(0, gridPoints.Count);
+            
+            randomList.Add(gridPoints[r]);
+            gridPoints.RemoveAt(r);
 
         }
 
-        ApplyShufflePointsToGridelemets();
+        gridPoints = randomList;
+
+        ApplyShufflePointsToGridelemets(randomList);
 
     }
 
-    //Apply Shuffling list of point position to Letters Grid
-    void ApplyShufflePointsToGridelemets()
-    {
 
-        for (int i = 0; i < lettersGridElement.Count - 1; i++)
+    /// <summary>
+    /// Shuffle character collection
+    /// </summary>
+    void RandomiseLetterCollection() {
+
+        //Randomise Source Data
+        List<GameObject> randomList = new List<GameObject>();
+        
+
+        for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
         {
 
-            Vector3 posPoint = gridPoints[i];
+            var _random = new System.Random();
+            int r = Random.Range(0, lettersDataList.Count);
             
-            //lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition = posPoint;
+            randomList.Add(lettersDataList[r]);
             
-            StartCoroutine(ElementTakePlaceAfterMix(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i]));
+        }
+
+        lettersElemetOnGameGrid = randomList;
+        
+    }
+
+    //Apply Shuffling list of point position to Letters Grid
+    void ApplyShufflePointsToGridelemets(List<Vector3> inputList)
+    {
+
+        //Debug.Log(inputList.Count);
+        //Debug.Log(lettersElemetOnGameGrid.Count);
+        //Debug.Log(inputList.Count);
+        for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
+        {
+
+            Vector3 posPoint = inputList[i];
+
+            //lettersDataList[i].GetComponent<RectTransform>().transform.localPosition = posPoint;
+            
+            //StartCoroutine(ElementTakePlaceAfterMix(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, inputList[i]));
                
         }
 
     }
 
+    float delayCounter;
     private void Update()
     {
         //delete
         if (mix) {
-            Debug.Log("Test");
-            for (int i = 0; i < lettersGridElement.Count - 1; i++) {
 
-                lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition =
-                    Vector3.SmoothDamp(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 2f * Time.deltaTime);
+            delayCounter += Time.deltaTime;
+            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++) {
+
+                lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition =
+                   Vector3.SmoothDamp(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 2f * Time.deltaTime);
 
             }
-                
+
+            
         }
 
 
@@ -207,19 +383,23 @@ public class GridController : MonoBehaviour
 
         while (Vector3.Distance(startPos, endPos) > 0.01f)
         {
-
-            for (int i = 0; i < lettersGridElement.Count - 1; i++)
+            
+            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
             {
 
-                if (lettersGridElement[i].GetComponent<LetterElement>().OnGrid)
-                    lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition =
-                        Vector3.SmoothDamp(lettersGridElement[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 6f * Time.deltaTime);
                 
-            }
-            yield return new WaitForFixedUpdate();
+                if (lettersElemetOnGameGrid[i].GetComponent<LetterElement>().OnGrid)
+                    lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition =
+                        Vector3.SmoothDamp(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 6f * Time.deltaTime);
 
+              //if yield here manimate pattern "Matrix Style"  
+            }
+            
+            //if yield here animte pattern "Blob"
+            yield return null;
+            
         }
 
-
+        
     }
 }
