@@ -21,7 +21,7 @@ public class GridContainer : MonoBehaviour
     void Start()
     {
 
-        InitGrid();
+        //InitGrid();
 
     }
 

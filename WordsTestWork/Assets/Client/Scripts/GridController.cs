@@ -34,6 +34,7 @@ public class GridController : MonoBehaviour
     public int GridHeigthSize;
     private float elementOnGameGrid;
     int letterArrayCount;
+    float delayCounter; //delayCounter for reset mix flag for animation
 
     void Start()
     {
@@ -57,7 +58,6 @@ public class GridController : MonoBehaviour
         for (int i = 0; i < letterArray.Length; i++)
         {
 
-
             GameObject go = Instantiate(GridCharPrefab, WordsGridContainer.transform);
             go.GetComponent<LetterElement>().Index = i;
 
@@ -79,7 +79,7 @@ public class GridController : MonoBehaviour
     {
 
         mix = false;
-        //StopAllCoroutines();
+        ;
         //validate input for non empty and not string and check for 
         ColumnLength = InputController.instance.InputWidthValidate();
         RowLength = InputController.instance.InputHeightValidate();
@@ -92,39 +92,23 @@ public class GridController : MonoBehaviour
             int mulCountColumnRow = ColumnLength * RowLength;
             elementOnGameGrid = mulCountColumnRow;
 
-            //Reset all leters;
-
-
-
             for (int k = 0; k < lettersElemetOnGameGrid.Count; k++)
             {
 
                 lettersElemetOnGameGrid[k].GetComponent<LetterElement>().OnGrid = false;
                 lettersElemetOnGameGrid[k].GetComponent<RectTransform>().transform.localPosition = GridCharPrefab.transform.localPosition;
-                //ChangeLettersSize(36);
-
+                
             }
-
 
             lettersElemetOnGameGrid.Clear();
 
-
             CheckScreenWidthHeight();
-
-
-            
 
             for (int i = 0; i < mulCountColumnRow; i++)
             {
 
-                var _random = new System.Random();
-
-
                 var r = RandomNoDuplicate();
-                //Debug.Log(r);
-                //ShuffleElementInData();
-
-                //i
+                
                 if (lettersDataList[r].TryGetComponent(out LetterElement lelement)) {
 
                     
@@ -134,14 +118,12 @@ public class GridController : MonoBehaviour
 
                 Vector2 elementPosition = new Vector2(X_Start + (X_Space * (i % ColumnLength)), Y_Start + (-Y_Space * (i / ColumnLength)));
 
-                //i
                 if (lettersDataList[r].TryGetComponent(out RectTransform rectTrans)) {
 
                     rectTrans.localPosition = elementPosition;
 
                 }
                 
-                //i
                 lettersElemetOnGameGrid.Add(lettersDataList[r]);
 
                 if (ColumnLength > RowLength)
@@ -161,13 +143,9 @@ public class GridController : MonoBehaviour
 
             }
 
-            
-
             WordsGridContainer.GetComponent<RectTransform>().localPosition = new Vector3(-lettersElemetOnGameGrid[mulCountColumnRow - 1].transform.localPosition.x / 2,
                 (-lettersElemetOnGameGrid[mulCountColumnRow - 1].transform.localPosition.y / 2),
                 0);
-
-            
 
         }
         else {
@@ -177,10 +155,12 @@ public class GridController : MonoBehaviour
                 
         }
 
-
-        //WordsGridContainer.GetComponent<RectTransform>().localPosition = new Vector3(GridWidthSize / 2 - X_Space , GridHeigthSize / 2 - Y_Space, 0);
     }
-    int recurs = 0;
+
+    /// <summary>
+    /// Pick element from element Data to grid, with diplicate check
+    /// </summary>
+    /// <returns></returns>
     public int RandomNoDuplicate()
     {
 
@@ -198,25 +178,18 @@ public class GridController : MonoBehaviour
 
         }
 
-        
-
     }
 
     void CheckScreenWidthHeight() {
 
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
-        //Debug.Log(screenWidth);
-
+        
         float GameGridWidth = (ColumnLength * 30) + (X_Space * (ColumnLength - 1));
         float GameGridHeight = (RowLength * 30) + (Y_Space * (RowLength - 1));
 
-
-        //float width = (screenWidth - GameGridWidth) / ColumnLength;
+        
         float width = screenWidth - GameGridWidth;
-
-        //X_Space = defaultSpace / ColumnLength;
-        //Y_Space = defaultSpace / RowLength;
 
         float cellSpace = DataSettings.GetDefaultCellSpace;
 
@@ -234,39 +207,18 @@ public class GridController : MonoBehaviour
 
         }
 
-
     }
 
     void ChangeLettersSize(int fontSize) {
 
         for (int i = 0; i < lettersElemetOnGameGrid.Count; i++) {
 
-            //lettersDataList[i].GetComponent<TextMeshProUGUI>().fontSize = fontSize;
             lettersElemetOnGameGrid[i].GetComponent<TextMeshProUGUI>().fontSize = fontSize;
 
         }
 
     }
-    /// <summary>
-    /// Represent Count Showing letters element on game field
-    /// </summary>
-    /// <param name="count"></param>
-    void HideLetterFromViewOnGameGrid(int count) {
-
-        
-        for (int i = 0; i < count; i++)
-        {
-            if (!lettersDataList[i].GetComponent<LetterElement>().OnGrid)
-                lettersDataList[i].GetComponent<RectTransform>().transform.localPosition = GridCharPrefab.transform.localPosition;
-
-
-        }
-
-
-    }
-
-
-    //Take grid point as acnhor and mixed this like a hell
+    
     public void MixGrid()
     {
 
@@ -276,19 +228,16 @@ public class GridController : MonoBehaviour
 
             gridPoints.Clear();
 
-
             for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
             {
 
                 Vector3 posPoint = lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition;
                 gridPoints.Add(posPoint);
 
-
             }
-            //Debug.Log(gridPoints.Count);
+            
             RandomMixPoints();
 
-            //
             mix = true;
 
         }
@@ -301,23 +250,6 @@ public class GridController : MonoBehaviour
         
     }
 
-    void ShuffleElementInData() {
-
-        List<GameObject> randomList = new List<GameObject>();
-
-        for (int i = 0; i < lettersDataList.Count; i++) {
-
-            var random = new System.Random();
-            int r = random.Next(0, lettersDataList.Count);
-            randomList.Add(lettersDataList[r]);
-            lettersDataList.RemoveAt(r);
-
-        }
-
-        lettersDataList = randomList;
-
-    }
-
     void RandomMixPoints()
     {
 
@@ -328,7 +260,6 @@ public class GridController : MonoBehaviour
         for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
         {
 
-            //Debug.Log(i);
             var random = new System.Random();
             
             int r = random.Next(0, gridPoints.Count);
@@ -344,51 +275,23 @@ public class GridController : MonoBehaviour
 
     }
 
-
     /// <summary>
     /// Shuffle character collection
     /// </summary>
-    void RandomiseLetterCollection() {
-
-        //Randomise Source Data
-        List<GameObject> randomList = new List<GameObject>();
-        
-
-        for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
-        {
-
-            var _random = new System.Random();
-            int r = Random.Range(0, lettersDataList.Count);
-            
-            randomList.Add(lettersDataList[r]);
-            
-        }
-
-        lettersElemetOnGameGrid = randomList;
-        
-    }
-
+    
     //Apply Shuffling list of point position to Letters Grid
     void ApplyShufflePointsToGridelemets(List<Vector3> inputList)
     {
 
-        //Debug.Log(inputList.Count);
-        //Debug.Log(lettersElemetOnGameGrid.Count);
-        //Debug.Log(inputList.Count);
         for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
         {
 
             Vector3 posPoint = inputList[i];
 
-            //lettersDataList[i].GetComponent<RectTransform>().transform.localPosition = posPoint;
-            
-            //StartCoroutine(ElementTakePlaceAfterMix(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, inputList[i]));
-               
         }
 
     }
 
-    float delayCounter;
     private void Update()
     {
         //delete
@@ -402,14 +305,12 @@ public class GridController : MonoBehaviour
 
             }
 
-            
         }
-
 
     }
 
     //Letters Grid Mix Animation
-    //TODO: Refactor
+    //TODO: Delete
     IEnumerator ElementTakePlaceAfterMix(Vector3 startPos, Vector3 endPos)
     {
 
@@ -419,7 +320,6 @@ public class GridController : MonoBehaviour
             for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
             {
 
-                
                 if (lettersElemetOnGameGrid[i].GetComponent<LetterElement>().OnGrid)
                     lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition =
                         Vector3.SmoothDamp(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 6f * Time.deltaTime);
@@ -432,6 +332,6 @@ public class GridController : MonoBehaviour
             
         }
 
-        
     }
+
 }

@@ -10,7 +10,7 @@ public class ButtonMix : MonoBehaviour
     Button buttonMix;
 
     int pushCount;
-    float delayCount  = 1.5f;
+    float delayCount  = 0.5f;
     float timer;
     // Start is called before the first frame update
     void Start()
@@ -53,12 +53,6 @@ public class ButtonMix : MonoBehaviour
 
         }
         
-
-
-
     }
 
-    
-
-    
 }

@@ -10,7 +10,7 @@ public class PopUpWarning : MonoBehaviour
     private Button btn_Ok;
     [SerializeField]
     private TextMeshProUGUI textComponent;
-    // Start is called before the first frame update
+    
     void Start()
     {
 

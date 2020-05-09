@@ -15,7 +15,6 @@ public class UIController : MonoBehaviour
 
     public static UIController instance = null;
 
-    
     void Start()
     {
 

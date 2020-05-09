@@ -25,13 +25,12 @@ public class InputController : MonoBehaviour
         if (instance == null)
             instance = this;
 
-        
     }
 
     public int InputWidthValidate() {
 
         string inputText = inputWidth.text;
-        //Debug.Log(inputWidth.text);
+        
         //check for null or empty
         if (!string.IsNullOrEmpty(inputText))
         {
@@ -48,7 +47,7 @@ public class InputController : MonoBehaviour
                 else
                 {
 
-                    Debug.Log("Int is more than exist");
+                    //Int is more than exist
                     return 0;
 
                 }
@@ -64,7 +63,7 @@ public class InputController : MonoBehaviour
         else
         {
 
-            Debug.Log("Field is Empty");
+            //Field is Empty
             return 0;
 
         }
