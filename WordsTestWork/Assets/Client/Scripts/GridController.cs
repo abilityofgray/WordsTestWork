@@ -74,6 +74,24 @@ public class GridController : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        //TODO: refactor to Coroutine
+        if (mixAnimation)
+        {
+
+            //delayCounter += Time.deltaTime;
+            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
+            {
+
+                lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition =
+                   Vector3.SmoothDamp(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 2f * Time.deltaTime);
+
+            }
+
+        }
+
+    }
     //Draw grid
     public void GenerateGrid()
     {
@@ -181,6 +199,38 @@ public class GridController : MonoBehaviour
 
     }
 
+    public void MixGrid()
+    {
+
+        mixAnimation = false;
+        if (lettersElemetOnGameGrid.Count != 0)
+        {
+
+            gridPoints.Clear();
+
+            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
+            {
+
+                Vector3 posPoint = lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition;
+                gridPoints.Add(posPoint);
+
+            }
+
+            RandomMixPoints();
+
+            mixAnimation = true;
+
+        }
+        else
+        {
+
+            UIController.instance.PopUpWarnings(true,
+                "Нечего перемешивать");
+
+        }
+
+    }
+
     /// <summary>
     /// Check Screen Width and Height and apply to grid cell space X and Y
     /// </summary>
@@ -222,36 +272,7 @@ public class GridController : MonoBehaviour
 
     }
     
-    public void MixGrid()
-    {
-
-        mixAnimation = false;
-        if (lettersElemetOnGameGrid.Count != 0)
-        {
-
-            gridPoints.Clear();
-
-            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++)
-            {
-
-                Vector3 posPoint = lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition;
-                gridPoints.Add(posPoint);
-
-            }
-            
-            RandomMixPoints();
-
-            mixAnimation = true;
-
-        }
-        else {
-
-            UIController.instance.PopUpWarnings(true, 
-                "Нечего перемешивать");
-
-        }
-        
-    }
+    
 
     void RandomMixPoints()
     {
@@ -286,23 +307,6 @@ public class GridController : MonoBehaviour
         {
 
             Vector3 posPoint = inputList[i];
-
-        }
-
-    }
-
-    private void Update()
-    {
-        //TODO: refactor to Coroutine
-        if (mixAnimation) {
-
-            //delayCounter += Time.deltaTime;
-            for (int i = 0; i < lettersElemetOnGameGrid.Count; i++) {
-
-                lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition =
-                   Vector3.SmoothDamp(lettersElemetOnGameGrid[i].GetComponent<RectTransform>().transform.localPosition, gridPoints[i], ref velocity, 2f * Time.deltaTime);
-
-            }
 
         }
 
