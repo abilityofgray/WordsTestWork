@@ -18,7 +18,7 @@ public class InputController : MonoBehaviour
     public int SetMaxHeightLenght { set { heighMaxtLenght = value; }}
 
     public static InputController instance = null;
-    // Start is called before the first frame update
+    
     void Awake()
     {
 

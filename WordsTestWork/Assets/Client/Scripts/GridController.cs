@@ -75,16 +75,17 @@ public class GridController : MonoBehaviour
     }
 
     //Draw grid
-    public void DrawGrid()
+    public void GenerateGrid()
     {
 
+        //reset flag when generate new grid
         mixAnimation = false;
         
-        //validate input for non empty and not string and check for 
+        //validate input for non empty and not string 
         ColumnLength = InputController.instance.InputWidthValidate();
         RowLength = InputController.instance.InputHeightValidate();
 
-        //Check for inputField not empty  
+        //Check for column and row not empty  
         if (ColumnLength > 0 &&
             RowLength > 0)
         {
@@ -102,7 +103,7 @@ public class GridController : MonoBehaviour
 
             lettersElemetOnGameGrid.Clear();
 
-            CheckScreenWidthHeight();
+            ApplyScreenWidthHeightToGrid();
 
             for (int i = 0; i < mulCountColumnRow; i++)
             {
@@ -115,6 +116,7 @@ public class GridController : MonoBehaviour
 
                 }
 
+                //element position calculate
                 Vector2 elementPosition = new Vector2(X_Start + (X_Space * (i % ColumnLength)), Y_Start + (-Y_Space * (i / ColumnLength)));
 
                 if (lettersDataList[r].TryGetComponent(out RectTransform rectTrans)) {
@@ -140,6 +142,7 @@ public class GridController : MonoBehaviour
 
             }
 
+            //Reposition grid container at screen center
             WordsGridContainer.GetComponent<RectTransform>().localPosition = new Vector3(-lettersElemetOnGameGrid[mulCountColumnRow - 1].transform.localPosition.x / 2,
                 (-lettersElemetOnGameGrid[mulCountColumnRow - 1].transform.localPosition.y / 2),
                 0);
@@ -147,6 +150,7 @@ public class GridController : MonoBehaviour
         }
         else {
 
+           // if column and row field empty
            UIController.instance.PopUpWarnings(true,
                     "Введите ширину и высоту не больше 12");
                 
@@ -177,7 +181,10 @@ public class GridController : MonoBehaviour
 
     }
 
-    void CheckScreenWidthHeight() {
+    /// <summary>
+    /// Check Screen Width and Height and apply to grid cell space X and Y
+    /// </summary>
+    void ApplyScreenWidthHeightToGrid() {
 
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;

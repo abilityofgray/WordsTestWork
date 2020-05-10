@@ -23,7 +23,7 @@ public class ButtonGridDraw : MonoBehaviour
 
     void DrawGrid() {
 
-        GridController.instance.DrawGrid();
+        GridController.instance.GenerateGrid();
 
     }
 
