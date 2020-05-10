@@ -21,15 +21,6 @@ public class UIController : MonoBehaviour
         if (instance == null)
             instance = this;
 
-        InitButton();
-
-    }
-
-    void InitButton() {
-
-        //ButtonMix.onClick.AddListener();
-        //ButtonGenerate.onClick.AddListener();
-
     }
 
     //Pop Up Warnings Controller
@@ -48,9 +39,4 @@ public class UIController : MonoBehaviour
 
     }
 
-    public void MixGrid() {
-
-
-
-    }
 }

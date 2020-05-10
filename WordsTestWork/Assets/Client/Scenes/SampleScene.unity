@@ -195,7 +195,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 5.16e-43, w: 0}
+  m_BoundingSphereOverride: {x: 3.2e-42, y: 1.01e-43, z: 980710.94, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -641,15 +641,7 @@ MonoBehaviour:
   GridCharPrefab: {fileID: 1981754336}
   WordsGridContainer: {fileID: 1359265575}
   DataSettings: {fileID: 11400000, guid: 571cb3101d3ea1b4da0365fda0f3c337, type: 2}
-  X_Start: 0
-  Y_Start: 0
-  ColumnLength: 5
-  RowLength: 5
-  X_Space: 30
-  Y_Space: 65
-  mix: 0
-  GridWidthSize: 0
-  GridHeigthSize: 0
+  delayCounter: 0
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -2688,6 +2680,7 @@ GameObject:
   - component: {fileID: 1737564402}
   - component: {fileID: 1737564401}
   - component: {fileID: 1737564400}
+  - component: {fileID: 1737564403}
   m_Layer: 5
   m_Name: btn_gridGenerate
   m_TagString: Untagged
@@ -2757,18 +2750,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1737564401}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 361654295}
-        m_MethodName: DrawGrid
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1737564401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2805,6 +2787,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1737564398}
   m_CullTransparentMesh: 0
+--- !u!114 &1737564403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737564398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b788130cc4ae7a24aa58e1cf3b025276, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1838054075
 GameObject:
   m_ObjectHideFlags: 0
@@ -2990,8 +2984,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popUpWarnigs: {fileID: 722009382}
-  ButtonMix: {fileID: 0}
-  ButtonGenerate: {fileID: 0}
+  ButtonMix: {fileID: 1737564400}
+  ButtonGenerate: {fileID: 175607182}
 --- !u!1 &1981754336 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6273459419088306771, guid: 764a78b8d8e80d941811d9b672d5861f,
