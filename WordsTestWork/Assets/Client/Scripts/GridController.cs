@@ -313,7 +313,7 @@ public class GridController : MonoBehaviour
     }
 
     //Letters Grid Mix Animation
-    //TODO: Delete
+    //TODO: Issue with non stop coroutine with outcome fps drop
     IEnumerator ElementTakePlaceAfterMix(Vector3 startPos, Vector3 endPos)
     {
 
